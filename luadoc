@@ -1,0 +1,57 @@
+#!/usr/bin/ruby -w
+#
+# Usage:
+#   luadoc *.c *.lua > API.TXT
+#
+# Lua doc comments are contained in lightly formatted comment blocks.
+#
+# For C, the comment begin must match regex "^/*-" and the end must match "^*/".
+#
+# For Lua, the comment begin must match regex "^--[-" and the end must match "^]]".
+#
+# Sections should look like:
+#
+# /*-
+# ** Object - this does that
+#
+# more docs
+# */
+#
+# APIs should look like:
+#
+# /*-
+# -- result = obj:dothis(arg [, optional])
+#
+# do this to an object
+# */
+
+CBEG = /^\/\*-/
+CEND = /^\*\//
+
+LBEG = /^--\[\[-/
+LEND = /^\]\]/
+
+ARGF.each do |line|
+  #print "| "+line
+
+  if (line =~ CBEG)..(line =~ CEND) or (line =~ LBEG)..(line =~ LEND)
+    next if line =~ CBEG
+    next if line =~ CEND
+    next if line =~ LBEG
+    next if line =~ LEND
+
+    # Inject a little readable whitespace.
+    if line =~ /^\*\* /
+      print "\n" * 4
+    end
+    if line =~ /^-- /
+      print "\n" * 2
+    end
+    if line =~ /^- /
+      print "\n" * 1
+    end
+
+    print line
+  end
+end
+
